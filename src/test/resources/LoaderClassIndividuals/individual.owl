@@ -1,0 +1,64 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:obda="https://w3id.org/obda/vocabulary#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:untitled-ontology-33="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#">
+
+    <owl:Ontology rdf:about="">
+		<owl:imports rdf:resource="http://www.semanticweb.org/mmar/ontologies/2020/4/untitled-ontology-33"/>
+	</owl:Ontology>
+
+
+
+
+<!--
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+
+
+
+    <!-- http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#course1 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#course1"/>
+
+
+
+    <!-- http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#lola -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#lola">
+        <takesCourse rdf:resource="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#course1"/>
+    </owl:NamedIndividual>
+
+
+
+    <!-- http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#pepe -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#pepe">
+        <rdf:type rdf:resource="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#GraduateStudent"/>
+        <like rdf:resource="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#puzzle"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#puzzle -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#puzzle"/>
+
+
+    <!-- http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#Painting -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#Painting">
+        <rdf:type rdf:resource="http://www.semanticweb.org/mmar/ontologies/2020/3/untitled-ontology-33#Hobby"/>
+    </owl:NamedIndividual>
+
+
+</rdf:RDF>
