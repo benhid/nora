@@ -1,51 +1,29 @@
 cff-version: 1.2.0
-title: >-
-  NORA: Scalable OWL reasoner based on NoSQL databases and
-  Apache Spark
-year: 2023
-journal: >-
-  Software: Practice and Experience
-volume: 53
-issue: 12
-message: >-
-  If you use this software, please cite the following paper.
-type: article
-authors:
-  - family-names: Antonio
-    given-names: Benítez-Hidalgo
-  - family-names: Ismael
-    given-names: Navas-Delgado
-  - family-names: María del Mar
-    given-names: Roldán-García
-doi: 10.1002/spe.3258
-url: https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.3258
-abstract: >-
-  Reasoning is the process of inferring new knowledge and
-  identifying inconsistencies within ontologies. Traditional
-  techniques often prove inadequate when reasoning over
-  large Knowledge Bases containing millions or billions of
-  facts. This article introduces NORA, a persistent and
-  scalable OWL reasoner built on top of Apache Spark,
-  designed to address the challenges of reasoning over
-  extensive and complex ontologies. NORA exploits the
-  scalability of NoSQL databases to effectively apply
-  inference rules to Big Data ontologies with large ABoxes.
-  To facilitate scalable reasoning, OWL data, including
-  class and property hierarchies and instances, are
-  materialized in the Apache Cassandra database. Spark
-  programs are then evaluated iteratively, uncovering new
-  implicit knowledge from the dataset and leading to
-  enhanced performance and more efficient reasoning over
-  large-scale ontologies. NORA has undergone a thorough
-  evaluation with different benchmarking ontologies of
-  varying sizes to assess the scalability of the developed
-  solution.
-keywords:
-  - Apache Spark
-  - Knowledge base
-  - NoSQL
-  - OWL
-  - Reasoner
-license: MIT
+message: If you use this software, please cite it as below.
+title: NORA
 version: 1.0.0
 date-released: '2023-06-16'
+url: https://github.com/benhid/nora/
+preferred-citation:
+  type: article
+  title: >-
+    NORA: Scalable OWL reasoner based on NoSQL databases and
+    Apache Spark
+  journal: >-
+    Software: Practice and Experience
+  issue: 12
+  volume: 53
+  year: 2023
+  authors:
+    - family-names: Antonio
+      given-names: Benítez-Hidalgo
+    - family-names: Ismael
+      given-names: Navas-Delgado
+    - family-names: María del Mar
+      given-names: Roldán-García
+  keywords:
+    - Apache Spark
+    - Knowledge base
+    - NoSQL
+    - OWL
+    - Reasoner
