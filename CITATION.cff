@@ -1,25 +1,24 @@
 cff-version: 1.2.0
-title: NORA
+title: >-
+  NORA: Scalable OWL reasoner based on NoSQL databases and
+  Apache Spark
+year: 2023
+journal: >-
+  Software: Practice and Experience
+volume: 53
+issue: 12
 message: >-
-  If you use this software, please cite it using the
-  metadata from this file.
-type: software
+  If you use this software, please cite the following paper.
+type: article
 authors:
-  - given-names: Antonio Benítez-Hidalgo
-  - given-names: Ismael Navas-Delgado
-  - given-names: María del Mar Roldán-García
-identifiers:
-  - type: doi
-    value: 10.1002/spe.3258
-  - type: url
-    value: >-
-      https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.3258
-    description: url
-  - type: url
-    value: >-
-      https://onlinelibrary.wiley.com/doi/pdf/10.1002/spe.3258
-    description: e-print
-repository-code: 'https://github.com/benhid/nora'
+  - family-names: Antonio
+    given-names: Benítez-Hidalgo
+  - family-names: Ismael
+    given-names: Navas-Delgado
+  - family-names: María del Mar
+    given-names: Roldán-García
+doi: 10.1002/spe.3258
+url: https://onlinelibrary.wiley.com/doi/abs/10.1002/spe.3258
 abstract: >-
   Reasoning is the process of inferring new knowledge and
   identifying inconsistencies within ontologies. Traditional
@@ -48,3 +47,5 @@ keywords:
   - OWL
   - Reasoner
 license: MIT
+version: 1.0.0
+date-released: '2023-06-16'
