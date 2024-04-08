@@ -2,9 +2,9 @@
 
 The project is divided into two main modules:
 
-* The [`loader`](src/main/java/loader) module is responsible for loading the knowledge base and storing it in Apache Cassandra. The input files are in the form of OWL and RDF files, which are [parsed](src/main/loader/impl) with the help of the OWL API. The database schema is designed to store the data in a way that is efficient for querying (for further details, check the [implementations](src/main/java/table/impl/)).
+* The [`loader`](/src/main/java/loader) module is responsible for loading the knowledge base and storing it in Apache Cassandra. The input files are in the form of OWL and RDF files, which are [parsed](/src/main/java/loader/impl) with the help of the OWL API. The database schema is designed to store the data in a way that is efficient for querying (for further details, check the [implementations](/src/main/java/table/impl/)).
 
-* The [`reasoner`](src/main/java/reasoner) module reads the data from Apache Cassandra using Apache Spark and performs the reasoning tasks (transformations) on the data by running [Spark jobs](src/main/java/reasoner/impl) sequentially Inferences, i.e., new derived knowledge from the knowledge base, are then stored back in Apache Cassandra. This loop continues until no new inferences are generated.
+* The [`reasoner`](/src/main/java/reasoner) module reads the data from Apache Cassandra using Apache Spark and performs the reasoning tasks (transformations) on the data by running [Spark jobs](/src/main/java/reasoner/impl) sequentially Inferences, i.e., new derived knowledge from the knowledge base, are then stored back in Apache Cassandra. This loop continues until no new inferences are generated.
 
 ## Getting Started
 
@@ -16,7 +16,7 @@ The following sections provide a step-by-step guide to building and running the 
 * [Docker](https://docs.docker.com/get-docker/)
 * Maven (for generating the test data)
 
-### Pre-requisites
+### Pre-requisites
 
 1. Download the [LUBM ontology](https://swat.cse.lehigh.edu/projects/lubm/) (core ontology):
 
@@ -87,11 +87,11 @@ If you are using a different configuration, make sure to update the `config.prop
 
 5. Finally, run the loader:
 
-> Check the implementation of the loader to understand how the data is loaded into Apache Cassandra.For specific requirements, you may need to modify the loader implementation (e.g., to load data from a different source or in a different format).
-
 ```bash
 java -cp nora.jar loader.Loader univ-bench.owl individuals/ http://swat.cse.lehigh.edu/onto/univ-bench.owl
 ```
+
+> Check the implementation of the loader to understand how the data is loaded into Apache Cassandra. For specific requirements, you may need to modify the loader implementation (e.g., to load data from a different source or in a different format).
 
 6. Once the loader has finished, you can run the reasoner:
 
