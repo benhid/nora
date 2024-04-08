@@ -24,15 +24,15 @@ import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.literal;
 import static com.datastax.oss.driver.api.querybuilder.QueryBuilder.selectFrom;
 
 
-public class ReasonDB {
+public class Reasoner {
 
-    private final static Logger LOGGER = Logger.getLogger(ReasonDB.class);
+    private final static Logger LOGGER = Logger.getLogger(Reasoner.class);
 
     private final JavaSparkContext spark;
     private final Database connection;
     private final JedisPool pool;
 
-    public ReasonDB(Database connection, SparkConf conf, JedisPool pool) {
+    public Reasoner(Database connection, SparkConf conf, JedisPool pool) {
         this.connection = connection;
         this.spark = JavaSparkContext.fromSparkContext(SparkContext.getOrCreate(conf));
         this.pool = pool;
@@ -47,9 +47,17 @@ public class ReasonDB {
         JedisPool pool = new JedisPool(jedisPoolConfig, conf.getProperty("redis_host"), Integer.parseInt(conf.getProperty("redis_port")), 10000);
 
         SparkConf sparkConf = new SparkConf()
-                .setAppName("SparkReasonerDB")
-                //.setMaster("local[*]");
-                .set("spark.driver.host", conf.getProperty("spark_host"))
+                .setAppName("SparkReasonerDB");
+        String sparkHost = conf.getProperty("spark_host");
+        if (sparkHost != null && !sparkHost.isEmpty()) {
+            sparkConf = sparkConf.set("spark.driver.host", sparkHost);
+        } else {
+            // For local testing, you may want to set the master to "local[*]" to use all available cores.
+            LOGGER.info("Setting local Spark master...");
+            sparkConf = sparkConf.setMaster("local[*]");
+        }
+
+        sparkConf
                 .set("spark.driver.maxResultSize", "0")
                 .set("spark.driver.allowMultipleContexts", "true")
                 .set("spark.cassandra.auth.username", connection.getUsername())
@@ -63,12 +71,13 @@ public class ReasonDB {
         try {
             connection.connect();
 
-            ReasonDB reasonDB = new ReasonDB(connection, sparkConf, pool);
+            Reasoner reasonDB = new Reasoner(connection, sparkConf, pool);
             reasonDB.preloadCache();
             reasonDB.startLoop();
         } catch (DBInitException e) {
             LOGGER.error(e.getMessage());
         } finally {
+            LOGGER.info("Closing connection");
             connection.disconnect();
         }
     }
@@ -77,6 +86,8 @@ public class ReasonDB {
      * Preloads cache with commonly queried tables. This step is not required.
      */
     public void preloadCache() {
+        long startTime = System.currentTimeMillis();
+
         LOGGER.info("Populating cache");
 
         try (Jedis cache = pool.getResource()) {
@@ -169,6 +180,8 @@ public class ReasonDB {
         }
 
         LOGGER.info(String.format("Preloaded %s rows", numberOfRows));
+
+        LOGGER.info("Total warming up cache time elapsed: " + (System.currentTimeMillis() - startTime) + " ms");
     }
 
     /**
@@ -207,128 +220,186 @@ public class ReasonDB {
         boolean foundInferences = true;
         int stage = 1;
 
+        long inferenceTimeElapsed = 0;
+        long startInferenceTime = 0;
+
+        long timeElapsed = 0;
+        long startTime = 0;
+        
+        startTime = System.currentTimeMillis();
+
         while (foundInferences) {
             LOGGER.info("RUNNING STAGE #" + stage);
 
             Integer inferencesInserted;
 
             LOGGER.info("Starting complement family");
-
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> complementOfInferences = complementOf.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted = complementOf.resolve(complementOfInferences);
             complementOfInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> complementOfSecondInferences = complementOfSecond.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += complementOfSecond.resolve(complementOfSecondInferences);
             complementOfSecondInferences = null;
 
             LOGGER.info("Starting disjoint with");
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> disjointWithInferences = disjointWith.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += disjointWith.resolve(disjointWithInferences);
             disjointWithInferences = null;
 
             LOGGER.info("Starting object properties family");
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> opDomainInferences = opDomain.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += opDomain.resolve(opDomainInferences);
             opDomainInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, Tuple2<String, String>>> opInverseOfInferences = opInverseOf.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += opInverseOf.resolve(opInverseOfInferences);
             opInverseOfInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> opRangeInferences = opRange.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += opRange.resolve(opRangeInferences);
             opRangeInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, Tuple2<String, String>>> opSubPropertyOfInferences = opSubPropertyOf.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += opSubPropertyOf.resolve(opSubPropertyOfInferences);
             opSubPropertyOfInferences = null;
 
             LOGGER.info("Starting subclass family");
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> subclassOfClassInferences = subclassOfClass.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += subclassOfClass.resolve(subclassOfClassInferences);
             subclassOfClassInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> subclassOfAllInferences = subclassOfAll.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += subclassOfAll.resolve(subclassOfAllInferences);
             subclassOfAllInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<Tuple2<String, String>, String>> subclassOfIntersectionInferences = subclassOfIntersection.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += subclassOfIntersection.resolve(subclassOfIntersectionInferences);
             subclassOfIntersectionInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> subclassOfSomeSecondInferences = subclassOfSomeSecond.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += subclassOfSomeSecond.resolve(subclassOfSomeSecondInferences);
             subclassOfSomeSecondInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> subclassOfUnionSecondInferences = subclassOfUnionSecond.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += subclassOfUnionSecond.resolve(subclassOfUnionSecondInferences);
             subclassOfUnionSecondInferences = null;
 
             LOGGER.info("Starting equivalent family");
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> equivalentToAllInferences = equivalentToAll.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += equivalentToAll.resolve(equivalentToAllInferences);
             equivalentToAllInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> equivalentToClassInferences = equivalentToClass.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += equivalentToClass.resolve(equivalentToClassInferences);
             equivalentToClassInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<Tuple2<String, String>, String>> equivalentToIntersectionInferences = equivalentToIntersection.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += equivalentToIntersection.resolve(equivalentToIntersectionInferences);
             equivalentToIntersectionInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> equivalentToIntersectionSecondInferences = equivalentToIntersectionSecond.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += equivalentToIntersectionSecond.resolve(equivalentToIntersectionSecondInferences);
             equivalentToIntersectionSecondInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> equivalentToSomeInferences = equivalentToSome.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += equivalentToSome.resolve(equivalentToSomeInferences);
             equivalentToSomeInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> equivalentToSomeSecondInferences = equivalentToSomeSecond.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += equivalentToSomeSecond.resolve(equivalentToSomeSecondInferences);
             equivalentToSomeSecondInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> equivalentToUnionInferences = equivalentToUnion.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += equivalentToUnion.resolve(equivalentToUnionInferences);
             equivalentToUnionInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> equivalentToUnionSecondInferences = equivalentToUnionSecond.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += equivalentToUnionSecond.resolve(equivalentToUnionSecondInferences);
             equivalentToUnionSecondInferences = null;
 
             // From here, all new inferences goes to IsSameAs
-
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> equivalentToMaxCardinalityInferences = equivalentToMaxCardinality.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += equivalentToMaxCardinality.resolve(equivalentToMaxCardinalityInferences);
             equivalentToMaxCardinalityInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> equivalentToMinCardinalityInferences = equivalentToMinCardinality.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += equivalentToMinCardinality.resolve(equivalentToMinCardinalityInferences);
             equivalentToMinCardinalityInferences = null;
 
             LOGGER.info("Starting functional properties");
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> functionalPropertyInferences = functionalProperty.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += functionalProperty.resolve(functionalPropertyInferences);
             functionalPropertyInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> inverseFunctionalPropertyInferences = inverseFunctionalProperty.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += inverseFunctionalProperty.resolve(inverseFunctionalPropertyInferences);
             inverseFunctionalPropertyInferences = null;
 
             LOGGER.info("Starting same as");
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, String>> sameAsClassIndividualInferences = sameAsClassIndividual.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += sameAsClassIndividual.resolve(sameAsClassIndividualInferences);
             sameAsClassIndividualInferences = null;
 
+            startInferenceTime = System.currentTimeMillis();
             List<Tuple2<String, Tuple2<String, String>>> sameAsPropIndividualInferences = sameAsPropIndividual.inference();
+            inferenceTimeElapsed += (System.currentTimeMillis() - startInferenceTime);
             inferencesInserted += sameAsPropIndividual.resolve(sameAsPropIndividualInferences);
             sameAsPropIndividualInferences = null;
 
@@ -343,6 +414,12 @@ public class ReasonDB {
 
             stage++;
         }
+    
+        timeElapsed = System.currentTimeMillis() - startTime;
+
+        LOGGER.info("Total time elapsed: " + timeElapsed + " ms");
+
+        LOGGER.info("Total inference time elapsed: " + inferenceTimeElapsed + " ms");
     }
 
 }

@@ -8,7 +8,7 @@ Tested with [OpenJDK 11](https://docs.aws.amazon.com/corretto/latest/corretto-11
 
 Use `gradle` to build the project:
 
-```console
+```bash
 $ make build
 ```
 
@@ -16,33 +16,35 @@ $ make build
 
 Before running the project, edit the `config.properties` and set your own values. Make sure to set the `NORA_CONFIG` environment variable to the path of the `config.properties` file:
 
-```console
+```bash
 $ export NORA_CONFIG=$(pwd)/config.properties
 ```
 
-The following command can be used to load the ontology into the database:
+Load the ontology into the database:
 
-```console
-$ java -cp nora.jar loader.LoadUnivBench
+```bash
+$ java -cp nora.jar loader.Loader examples/ontology.owl examples/individuals/ http://w3id.org/examples/ontology.owl
 ```
 
-Then, start the reasoning process with the following command:
+Then, start the reasoning process by running the following command:
 
-```console
-$ java -cp nora.jar reasoner.ReasonDB
+```bash
+$ java -cp nora.jar reasoner.Reasoner
 ```
 
 or by using `spark-submit`:
 
-```console
+```bash
 $ spark-submit \
     --name nora \
-    --class reasoner.ReasonDB \
+    --class reasoner.Reasoner \
     --master spark://host:port \
     --driver-memory 6G \
     --executor-memory 120G \
     file:///home/user/nora.jar 10
 ```
+
+A step-by-step guide is available in the [docs](docs/README.md) directory.
 
 ## Troubleshooting
 
