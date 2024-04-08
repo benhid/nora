@@ -4,6 +4,8 @@
 
 Tested with [OpenJDK 11](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/generic-linux-install.html) and Gradle 7.5.1.
 
+Cite us:
+> _Benítez-Hidalgo A, Navas-Delgado I, Roldán-García MM. NORA: Scalable OWL reasoner based on NoSQL databases and Apache Spark. Softw Pract Exper. 2023; 53(12): 2377–2392. doi: 10.1002/spe.3258_
 ## Building the project
 
 Use `gradle` to build the project:

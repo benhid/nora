@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: If you use this software, please cite it as below.
+title: NORA
+version: 1.0.0
+date-released: '2023-06-16'
+url: https://github.com/benhid/nora/
+preferred-citation:
+  type: article
+  title: >-
+    NORA: Scalable OWL reasoner based on NoSQL databases and
+    Apache Spark
+  journal: >-
+    Software: Practice and Experience
+  issue: 12
+  volume: 53
+  year: 2023
+  authors:
+    - family-names: Antonio
+      given-names: Benítez-Hidalgo
+    - family-names: Ismael
+      given-names: Navas-Delgado
+    - family-names: María del Mar
+      given-names: Roldán-García
+  keywords:
+    - Apache Spark
+    - Knowledge base
+    - NoSQL
+    - OWL
+    - Reasoner
