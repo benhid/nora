@@ -6,6 +6,7 @@ Tested with [OpenJDK 11](https://docs.aws.amazon.com/corretto/latest/corretto-11
 
 Cite us:
 > _Benítez-Hidalgo A, Navas-Delgado I, Roldán-García MM. NORA: Scalable OWL reasoner based on NoSQL databases and Apache Spark. Softw Pract Exper. 2023; 53(12): 2377–2392. doi: 10.1002/spe.3258_
+
 ## Building the project
 
 Use `gradle` to build the project:
@@ -16,7 +17,7 @@ $ make build
 
 ## Getting started
 
-Before running the project, edit the `config.properties` and set your own values. Make sure to set the `NORA_CONFIG` environment variable to the path of the `config.properties` file:
+Before running the project, edit the [`config.properties`](config.properties) and set your own values. Make sure to set the `NORA_CONFIG` environment variable to the path of the `config.properties` file:
 
 ```bash
 $ export NORA_CONFIG=$(pwd)/config.properties
@@ -46,11 +47,11 @@ $ spark-submit \
     file:///home/user/nora.jar 10
 ```
 
-A step-by-step guide is available in the [docs](docs/README.md) directory.
+A step-by-step guide is available [here](GETTING_STARTED.md).
 
 ## Troubleshooting
 
-#### Exception `java.lang.OutOfMemoryError: Java heap space` when running Apache Spark in client mode 
+#### Exception `java.lang.OutOfMemoryError: Java heap space` when running Apache Spark in client mode
 
 The flag `-Xmx` specifies the maximum memory allocation pool for a Java Virtual Machine (JVM), while `-Xms` specifies the initial memory allocation pool. These flags can be set to modify the Java memory settings:
 

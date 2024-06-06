@@ -62,9 +62,11 @@ make build
 
 3. Launch the Apache Cassandra and Redis servers:
 
+> Here we are using ScyllaDB and Dragonfly as drop-in replacements for Apache Cassandra and Redis, respectively. You can use the official images for Apache Cassandra and Redis if you prefer.
+
 ```bash
 docker run --name scylla-master -p 7000:7000 -p 7001:7001 -p 9042:9042 -p 9160:9160 -p 10000 -d scylladb/scylla
-docker run --name redis-master -p 6379:6379 -d docker.dragonflydb.io/dragonflydb/dragonfly
+docker run --name dragonfly-master -p 6379:6379 -d docker.dragonflydb.io/dragonflydb/dragonfly
 ```
 
 4. Before running the loader, create a `config.properties` file and set the `NORA_CONFIG` environment variable to its path:

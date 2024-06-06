@@ -13,7 +13,10 @@ repositories {
     mavenCentral()
 }
 
-// Output to build/libs/shadow.jar
+javadoc {
+    destinationDir = file("docs/")
+}
+
 shadowJar {
    archiveBaseName.set('shadow')
    archiveClassifier.set('')
@@ -29,7 +32,7 @@ tasks.named('shadowJar') {
 }
 
 tasks.named('test') {
-    useJUnitPlatform() 
+    useJUnitPlatform()
 }
 
 configurations.all {
